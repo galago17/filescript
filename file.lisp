@@ -1,3 +1,5 @@
+(defparameter *last* nil)
+
 (defun mov (file newfile)
   (let
       ((temp nil))
@@ -18,12 +20,10 @@
   (rename-file file newfile))
 (defun tpl (name)
   (progn
-    (format t "~a: " name)
+    (format t "~a: ~%" name)
     (read-line)))
 
 (defun eval-file (filename)
-  (defparameter *last* nil)
-  (defparameter *var* (read-line))
   (with-open-file (in filename)
     (loop for line = (read-line in nil) while line do
           (if (equal line "") nil (eval-line line)))
@@ -31,14 +31,12 @@
 
 (defun eval-line (line)
   (cond 
-    ((char= (elt line 0) #\[) 
+    ((char= (elt line 0) #\>) 
      (content line))
-    ((equal (get-command line) 'def)
-     (def (get-body line)))
     (t (funcall (get-command line) (get-body line)))))
 
 (defun content (line)
-  (append-to-file (subseq line 2 (- (length line) 2)) *last*))
+  (append-to-file (subseq line 2 (- (length line) 1)) *last*))
 
 (defun append-to-file (text file)
   (with-open-file (out file :direction :output :if-exists :append)
@@ -66,6 +64,4 @@
 (defun inc (file)
   (eval-file file))
 
-
-(defun main ()
-  (eval-file (read-line)))
+(eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript"))
