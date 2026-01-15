@@ -64,4 +64,8 @@
 (defun inc (file)
   (eval-file file))
 
-(eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript"))
+(defun main () 
+  (progn
+    (format t "Template: ")
+    (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript"))))
+
