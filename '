@@ -16,14 +16,9 @@
 
 (defun ren (file newfile)
   (rename-file file newfile))
-(defun tpl (name)
-  (progn
-    (format t "~a: " name)
-    (read-line)))
 
 (defun eval-file (filename)
   (defparameter *last* nil)
-  (defparameter *var* (read-line))
   (with-open-file (in filename)
     (loop for line = (read-line in nil) while line do
           (if (equal line "") nil (eval-line line)))
@@ -66,6 +61,8 @@
 (defun inc (file)
   (eval-file file))
 
+(defmacro def (name &optional (value (read-line)))
+  `(defparameter ,name ,value))
 
 (defun main ()
   (eval-file (read-line)))
