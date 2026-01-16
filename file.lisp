@@ -47,6 +47,8 @@
     ((char= (elt line 0) #\>)
      (setf *content* nil))
     (*content* (add line))
+    ((char= (elt line 0) #\#)
+     (format t "~a~%" line))
     (t (funcall (get-command line) (get-body line)))))
 
 (defun add (body)

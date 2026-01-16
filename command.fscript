@@ -1,1 +1,11 @@
-add "package" (val "pkg") ";"
+# Java Project Template
+cnf (& (tpl "project") (tpl "pkg") "Main.java")
+
+add (str "package " (val "pkg") ";")
+<
+public class Main {
+  public static void main () {
+    System.out.println("Hello World");
+  }
+}
+>
