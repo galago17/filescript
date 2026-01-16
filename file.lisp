@@ -65,7 +65,9 @@
   (eval-file file))
 
 (defun main () 
-  (progn
-    (format t "Template: ")
-    (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript"))))
+    (let ((mode (read-line)))
+      (cond ((equal mode "template")
+             (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript")))
+            (t (eval-file (read-line))))))
+
 
