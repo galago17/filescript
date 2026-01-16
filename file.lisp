@@ -13,13 +13,17 @@
       (with-open-file (out newfile :direction :output :if-exists :supersede)
         (loop for line in (reverse temp) do
               (format out "~a~%" line)))
-      (delete-file file))))
+      (delete-file file)
+      (format t "Moved ~a -> ~a~%" file newfile))))
 
 (defun del (file)
-  (delete-file file))
+  (delete-file file)
+  (format t "Deleted ~a~%" file))
 
 (defun ren (file newfile)
-  (rename-file file newfile))
+  (rename-file file newfile)
+  (format t "Renamed ~a -> ~a~%" file newfile))
+
 (defun tpl (name)
   (progn
     (format t "~a: ~%" name)
@@ -46,7 +50,8 @@
     (t (funcall (get-command line) (get-body line)))))
 
 (defun add (body)
-  (append-to-file body *last*))
+  (append-to-file body *last*)
+  (format t "+ ~a~%" body))
 
 (defun str (&rest parts)
   (reduce (lambda(x y) (concatenate 'string x y)) parts))
@@ -68,10 +73,12 @@
     (with-open-file (out file :direction :output :if-does-not-exist :create)
     t)
     (setf *last* file)
-    (print *last*)))
+    (format t "Created ~a~%" file)))
+    
 
 (defun cnd (path)
-  (ensure-directories-exist (concatenate 'string path "/")))
+  (ensure-directories-exist (concatenate 'string path "/"))
+  (format t "Created ~a/~%" path))
 
 (defun inc (file)
   (eval-file file))
@@ -79,5 +86,5 @@
 (defun main () 
     (let ((mode (read-line)))
       (cond ((equal mode "template")
-             (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript")))
-            (t (eval-file (read-line))))))
+            (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript")))
+            ((equal mode "local") (eval-file (read-line))))))
