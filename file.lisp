@@ -1,5 +1,3 @@
-(require :uiop)
-
 (defparameter *last* nil)
 (defparameter *tpls* (make-hash-table :test #'equal))
 (defparameter *content* nil)
@@ -85,6 +83,9 @@
 (defun inc (file)
   (eval-file file))
 
+(defun print-documentation ()
+  (format t "~{~a~%~}" (list "filescript mode filepath" "mode == template -> filepath is relative to HOME/.local/share/filescript and filepath is the name of the template without the .fscript extension" "mode == local -> filepath is local")))
+
 (defun main ()
   (let* (
          (args (uiop:command-line-arguments))
@@ -95,4 +96,6 @@
        (eval-file (concatenate 'string "~/.local/share/filescript/" file ".fscript")))
       ((equal mode "local")
        (eval-file file)) 
-      (t (format t "Error: Invalid mode")))))
+      (t (progn 
+           (format t "Error: Invalid mode~%")
+           (print-documentation))))))
