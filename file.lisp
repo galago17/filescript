@@ -22,6 +22,7 @@
 
 (defun ren (file newfile)
   (rename-file file newfile)
+  (setf *last* newfile)
   (format t "Renamed ~a -> ~a~%" file newfile))
 
 (defun tpl (name)
