@@ -1,4 +1,6 @@
 (defparameter *last* nil)
+(defparameter *tpls* (make-hash-table :test #'equal))
+(defparameter *content* nil)
 
 (defun mov (file newfile)
   (let
@@ -21,7 +23,12 @@
 (defun tpl (name)
   (progn
     (format t "~a: ~%" name)
-    (read-line)))
+    (let ((val (read-line)))
+      (setf (gethash name *tpls*) val)
+      val)))
+
+(defun val (name)
+  (gethash name *tpls*))
 
 (defun eval-file (filename)
   (with-open-file (in filename)
@@ -31,13 +38,18 @@
 
 (defun eval-line (line)
   (cond 
-    ((char= (elt line 0) #\>) 
-     (content line))
+    ((char= (elt line 0) #\<) 
+     (setf *content* t))
+    ((char= (elt line 0) #\>)
+     (setf *content* nil))
+    (*content* (add line))
     (t (funcall (get-command line) (get-body line)))))
 
-(defun content (line)
-  (append-to-file (subseq line 2 (- (length line) 1)) *last*))
+(defun add (body)
+  (append-to-file body *last*))
 
+(defun str (&rest parts)
+  (reduce (lambda(x y) (concatenate 'string x y)) parts))
 (defun append-to-file (text file)
   (with-open-file (out file :direction :output :if-exists :append)
     (write-line text out)))
@@ -59,7 +71,7 @@
     (print *last*)))
 
 (defun cnd (path)
-  (ensure-directories-exist path))
+  (ensure-directories-exist (concatenate 'string path "/")))
 
 (defun inc (file)
   (eval-file file))
@@ -69,5 +81,3 @@
       (cond ((equal mode "template")
              (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript")))
             (t (eval-file (read-line))))))
-
-
