@@ -1,3 +1,5 @@
+(require :uiop)
+
 (defparameter *last* nil)
 (defparameter *tpls* (make-hash-table :test #'equal))
 (defparameter *content* nil)
@@ -83,8 +85,14 @@
 (defun inc (file)
   (eval-file file))
 
-(defun main () 
-    (let ((mode (read-line)))
-      (cond ((equal mode "template")
-            (eval-file (concatenate 'string "~/.local/share/filescript/" (read-line) ".fscript")))
-            ((equal mode "local") (eval-file (read-line))))))
+(defun main ()
+  (let* (
+         (args (uiop:command-line-arguments))
+         (mode (first args))
+         (file (second args)))
+    (cond
+      ((equal mode "template")
+       (eval-file (concatenate 'string "~/.local/share/filescript/" file ".fscript")))
+      ((equal mode "local")
+       (eval-file file)) 
+      (t (format t "Error: Invalid mode")))))
