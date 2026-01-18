@@ -1,2 +1,3 @@
-(load "file.lisp")
-(sb-ext:save-lisp-and-die "filescript" :toplevel #'main :executable t)
+(pushnew (uiop:getcwd) ql:*local-project-directories*)
+(ql:quickload :filescript)
+(asdf:make :filescript)
