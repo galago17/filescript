@@ -31,14 +31,13 @@
   (format t "Renamed ~a -> ~a~%" file newfile))
 
 (defun tpl (name)
-  (progn
-    (format t "~a: ~%" name)
-    (let ((val (read-line)))
-      (setf (gethash name *tpls*) val)
-      val)))
-
-(defun val (name)
-  (gethash name *tpls*))
+  (let ((access (gethash name *tpls*)))
+    (if access access 
+        (progn
+          (format t "~a: ~%" name)
+          (let ((val (read-line)))
+            (setf (gethash name *tpls*) val)
+            val)))))
 
 (defun eval-file (filename)
   (with-open-file (in filename)
@@ -55,14 +54,15 @@
     (*content* (add line))
     ((char= (elt line 0) #\#)
      (format t "~a~%" line))
-    (t (funcall (get-command line) (get-body line)))))
+    (t (apply (get-command line) (get-body line)))))
 
-(defun add (body)
-  (append-to-file body *last*)
-  (format t "+ ~a~%" body))
+(defun add (&rest body)
+  (append-to-file (apply #'str body) *last*)
+  (format t "+ ~a~%" (apply #'str body)))
 
 (defun str (&rest parts)
   (reduce (lambda(x y) (concatenate 'string x y)) parts))
+
 (defun append-to-file (text file)
   (with-open-file (out file :direction :output :if-exists :append)
     (write-line text out)))
@@ -72,21 +72,26 @@
 
 (defun get-command (line)
   (read-from-string line))
+
 (defun get-body (line)
-  (eval (read-from-string line t nil :start 3)))
+  (mapcar #'eval (cdr (get-objs line))))
+
+(defun get-objs (line)
+  (with-input-from-string (in line)
+    (loop for form = (read in nil nil)
+          while form
+          collect form)))
 
 (defun cnf (file)
   (progn 
     (ensure-directories-exist file)
     (with-open-file (out file :direction :output :if-does-not-exist :create)
-    t)
-    (setf *last* file)
-    (format t "Created ~a~%" file)))
-    
+      (format t "Created ~a~%" file))
+    (setf *last* file)))
 
 (defun cnd (path)
-  (ensure-directories-exist (concatenate 'string path "/"))
-  (format t "Created ~a/~%" path))
+  (ensure-directories-exist path)
+  (format t "Created ~a~%" path))
 
 (defun inc (file)
   (eval-file file))

@@ -2,7 +2,8 @@
 
 cnf (& (tpl "project") (tpl "pkg") "Main.java")
 
-add (str "package " (val "pkg") ";")
+add "package " (tpl "pkg") ";"
+
 <
 public class Main {
   public static void main () {
