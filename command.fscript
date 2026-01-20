@@ -1,6 +1,6 @@
 # Java Project Template
 
-cnf (& (tpl "project") (tpl "pkg") "Main.java")
+cnf (& "/" (tpl "project") (tpl "pkg") "Main.java")
 
 add "package " (tpl "pkg") ";"
 
