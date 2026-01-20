@@ -10,9 +10,12 @@
 (defun & (delimiter &rest parts)
   (reduce (lambda(x y) (concatenate 'string x delimiter y)) parts))
   
-(defun copy (file newfile)
-  (let
-      ((temp nil))
+(defun copy (line)
+  (let*
+    ((strs (uiop:split-string line))
+     (file (car strs))
+     (newfile (second strs))
+     (temp nil))
     (progn
       (with-open-file (in file)
         (loop for line = (read-line in nil) while line do
@@ -43,10 +46,13 @@
         (delete-file path))
     (format t "Deleted ~a~%" path)))
 
-(defun move (file newfile)
-  (rename-file file newfile)
-  (setf *last* newfile)
-  (format t "Renamed ~a -> ~a~%" file newfile))
+(defun move (line)
+  (let* ((strs (uiop:split-string line))
+        (file (car strs))
+        (newfile (second strs)))
+    (rename-file file newfile)
+    (setf *last* newfile)
+    (format t "Renamed ~a -> ~a~%" file newfile)))
 
 (defun tpl (name)
   (let ((access (gethash name *tpls*)))
@@ -73,13 +79,31 @@
   (read-from-string line))
 
 (defun get-body (line)
-  (mapcar #'eval (cdr (get-objs line))))
+  (let ((fst (multiple-value-list (read-from-string line))))
+    (subseq line (second fst))))
 
 (defun get-objs (line)
   (with-input-from-string (in line)
     (loop for form = (read in nil nil)
           while form
           collect form)))
+
+(defun expand (line)
+  (cond
+    ((not (find #\> line))
+     line)
+    (t (expand (replace-var line)))))
+
+(defun replace-var (line)
+  (let* (
+         (opening (position #\< line))
+         (closing (position #\> line))
+         (tpl-name (subseq line (1+ opening) closing)))
+    (concatenate
+      'string
+      (subseq line 0 opening)
+      (tpl tpl-name)
+      (subseq line (1+ closing)))))
 
 (defun eval-line (line)
   (cond 
@@ -90,7 +114,7 @@
     (*content* (add line))
     ((char= (elt line 0) #\#)
      (format t "~a~%" line))
-    (t (apply (get-command line) (get-body line)))))
+    (t (funcall (get-command line) (expand (get-body line))))))
 
 (defun eval-file (filename)
   (with-open-file (in filename)

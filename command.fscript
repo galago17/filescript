@@ -1,8 +1,8 @@
 # Java Project Template
 
-cnf (& "/" (tpl "project") (tpl "pkg") "Main.java")
+cnf <project>/<pkg>/Main.java
 
-add "package " (tpl "pkg") ";"
+add package <pkg>;
 
 <
 public class Main {
