@@ -26,21 +26,21 @@
               (format out "~a~%" line)))
       (format t "Copied ~a -> ~a~%" file newfile))))
 
-(defun cnf (file)
+(defun newfile (file)
   (progn 
     (ensure-directories-exist file)
     (with-open-file (out file :direction :output :if-does-not-exist :create)
       (format t "Created ~a~%" file))
     (setf *last* file)))
 
-(defun cnd (path)
+(defun newdir (path)
   (ensure-directories-exist path)
   (format t "Created ~a~%" path))
 
-(defun inc (file)
+(defun include (file)
   (eval-file file))
 
-(defun del (path)
+(defun delpath (path)
   (progn
     (if (equal (file-namestring path) "") (uiop:delete-directory-tree path :validate t)
         (delete-file path))
@@ -67,6 +67,20 @@
   (append-to-file (apply #'str body) *last*)
   (format t "+ ~a~%" (apply #'str body)))
 
+(defun addstr (body)
+  (let* ((objs (get-objs body))
+        (expanded (mapcar
+          (lambda (x)
+            (if (stringp x)
+                x
+                (replace-var (string x))))
+          objs))
+        (line
+          (reduce (lambda(x y) (concatenate 'string x y)) expanded)))
+    (append-to-file line *last*)
+    (format t "+ ~a~%" line)))
+            
+
 (defun str (&rest parts)
   (reduce (lambda(x y) (concatenate 'string x y)) parts))
 
@@ -88,11 +102,11 @@
           while form
           collect form)))
 
-(defun expand (line)
+(defun expand-var (line)
   (cond
-    ((not (find #\> line))
+    ((not (position #\< line))
      line)
-    (t (expand (replace-var line)))))
+    (t (expand-var (replace-var line)))))
 
 (defun replace-var (line)
   (let* (
@@ -114,7 +128,9 @@
     (*content* (add line))
     ((char= (elt line 0) #\#)
      (format t "~a~%" line))
-    (t (funcall (get-command line) (expand (get-body line))))))
+    ((equal (get-command line) 'addstr) 
+     (funcall (get-command line) (get-body line)))
+    (t (funcall (get-command line) (expand-var (get-body line))))))
 
 (defun eval-file (filename)
   (with-open-file (in filename)
