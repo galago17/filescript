@@ -7,12 +7,14 @@
 This does allow you to create infinite loops. Use with caution  
 **delpath**: delete file or directory 
 ``<name>``: Get value of variable ``name``. If it doesn't exist yet, prompt for a value. 
+
 **add**: Append line to active file  
 **addstr**: This keyword was added so as not to overcomplicate by implementing escape characters.
 It concatenates strings and appends them like **add**, e.g. addstr ``addstr "hello " <name> "!"``  
 
 The active file is the last file that an action was performed on, e.g. rename, creation, etc. except for deletion.  
-**select**: Manually change active file. 
+**select**: Manually change active file.  
+
 ``<``: Start block: Blocks are a shortcut for ``add`` when you don't need to use variables in the file content  
 ``>``: Close block.  
 Content in blocks is added to the active file verbatim.  
