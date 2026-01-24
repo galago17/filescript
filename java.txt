@@ -1,6 +1,6 @@
 # Java Project Template
 
-cnf <project>/<pkg>/Main.java
+newfile <project>/<pkg>/Main.java
 
 add package <pkg>;
 addstr "// test<>" <test>

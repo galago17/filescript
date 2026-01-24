@@ -40,6 +40,10 @@
 (defun include (file)
   (eval-file file))
 
+(defun select (file)
+  (setf *last* file)
+  (format t "Editing ~a~%" file))
+
 (defun delpath (path)
   (progn
     (if (equal (file-namestring path) "") (uiop:delete-directory-tree path :validate t)

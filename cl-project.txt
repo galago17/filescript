@@ -1,0 +1,26 @@
+newdir <project>
+newdir <project>/src
+
+newfile <project>/src/package.lisp
+add (defpackage :<mainpkg>
+add   (:use :cl))
+
+newfile <project>/src/<mainpkg>.lisp
+add (in-package :<mainpkg>)
+<
+(defun main ()
+  (format t "Hello World"))
+>
+
+newfile <project>/<project>.asd
+
+add (defsystem "<project>"
+<
+  :components (
+               (:module "src"
+                :components
+>
+add             ((:file "<mainpkg>"))))
+add   :build-operation "program-op"
+add   :build-pathname "<project>"
+add   :entry-point "<mainpkg>::main")
