@@ -5,6 +5,5 @@
                 ((:file "main"))))
   :build-operation "program-op"
   :build-pathname "filescript"
-  :entry-point "filescript::main")
-
+  :entry-point "filescript:main")
 

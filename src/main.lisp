@@ -1,5 +1,6 @@
 (defpackage :filescript
-  (:use :cl))
+  (:use :cl)
+  (:export #:main))
 
 (in-package :filescript)
 
@@ -142,19 +143,9 @@
           (if (equal line "") nil (eval-line line)))
     t))
 
-(defun print-documentation ()
-  (format t "~{~a~%~}" (list "filescript mode filepath" "mode == template -> filepath is relative to HOME/.local/share/filescript and filepath is the name of the template without the .fscript extension" "mode == local -> filepath is local")))
-
 (defun main ()
   (let* (
          (args (uiop:command-line-arguments))
-         (mode (first args))
-         (file (second args)))
-    (cond
-      ((equal mode "template")
-       (eval-file (concatenate 'string "~/.local/share/filescript/" file ".fscript")))
-      ((equal mode "local")
-       (eval-file file)) 
-      (t (progn 
-           (format t "Error: Invalid mode~%")
-           (print-documentation))))))
+         (file (first args)))
+    (setf *package* (find-package 'filescript))
+    (eval-file file)))
