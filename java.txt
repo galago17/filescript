@@ -1,13 +1,12 @@
 # Java Project Template
 
-newfile <project>/<pkg>/Main.java
+newfile <project>/src/<pkg>/Main.java
 
 add package <pkg>;
-addstr "// test<>" <test>
 
 <
 public class Main {
-  public static void main () {
+  public static void main (String[] args) {
     System.out.println("Hello World");
   }
 }

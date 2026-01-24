@@ -57,7 +57,7 @@
         (newfile (second strs)))
     (rename-file file newfile)
     (setf *last* newfile)
-    (format t "Renamed ~a -> ~a~%" file newfile)))
+    (format t "Moved ~a -> ~a~%" file newfile)))
 
 (defun tpl (name)
   (let ((access (gethash name *tpls*)))
